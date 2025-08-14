@@ -204,13 +204,15 @@ server.log
 frontend.log
 ngrok.log
 
-# Data files
+# Data files (exclude large datasets but allow sample data)
 *.csv
+!sample_*.csv
+!test_*.csv
 exported_data.csv
 data/
 datasets/
 
-# Model files (if you want to exclude them)
+# Model files (exclude large model files but allow small ones)
 *.joblib
 *.pkl
 *.pickle
@@ -448,7 +450,7 @@ grafana/
 *.heif
 
 # ===========================================
-# Documents
+# Documents (exclude large files but allow documentation)
 # ===========================================
 *.pdf
 *.doc
@@ -462,9 +464,49 @@ grafana/
 *.odp
 *.rtf
 *.txt
-*.md
+!README.md
+!*.md
 *.tex
 *.latex
+
+# ===========================================
+# Project Exceptions (files we want to include)
+# ===========================================
+# Allow important project files
+!models/
+!models/*.py
+!models/*.sh
+!models/*.md
+!models/*.txt
+!models/*.json
+!models/*.js
+!models/*.jsx
+!models/*.ts
+!models/*.tsx
+!models/*.css
+!models/*.html
+
+# Allow frontend files
+!frontend/
+!frontend/src/
+!frontend/public/
+!frontend/package.json
+!frontend/package-lock.json
+
+# Allow Firebase files
+!firebase/
+!firebase/functions/
+!firebase/functions/index.js
+!firebase/functions/package.json
+!firebase/functions/config.js
+
+# Allow configuration files
+!.gitignore
+!config.py
+!requirements.txt
+!README.md
+!CONFIGURATION_GUIDE.md
+!FIREBASE_SETUP.md
 
 # ===========================================
 # End of .gitignore
