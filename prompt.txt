@@ -1,0 +1,73 @@
+@in my project there are various models 
+I want to crete a server that sends data to these models 
+Server's tasks :
+access the csv file and select a row at random, then attach time stamp on data , send one set of data directly to aws lambda server which sends it to the reciever , send another set of data after compressing with zlibit and send it to lambda server which just forwards it it reciever
+
+Reciever's tasks:
+the reciever is running all the models independently
+the non compressedn data is sent directly to the knn , randomforest , xgboost , into svm scaler and then svm model and into logistic scaler and then logistic model
+
+the compressed data is decompressed and the fed to knn , randomforest , xgboost , into svm scaler and then svm model and into logistic scaler and then logistic model
+
+the decompressed data is directly fed to special zlib models of knn , randomforest , xgboost , into svm scaler and then svm model and into logistic scaler and then logistic model
+
+after this data of pulse i.e. non compressed data of ecg and output of all models along with their time stamps from server are sent to fronted
+
+Frontend:
+
+fronted based on react that recieves data of ecg which is plotted as a graph 
+and outputs of all models is shown 
+a second graph is also plotted that shows the total time taken by data from server to fronted for comparision
+
+
+
+data is to be compressed using the following code or the same logic as below to compress a single row
+
+
+print("\nCompressing data with zlib and returning compressed bytes as features...")
+
+def compress_and_transform(data):
+    """Compress each row and return fixed-length numeric arrays of compressed bytes."""
+    compressed_rows = []
+
+    # First pass to find the maximum compressed length
+    max_len = 0
+    for row in data:
+        byte_data = row.astype(np.float32).tobytes()
+        compressed = zlib.compress(byte_data)
+        max_len = max(max_len, len(compressed))
+
+    # Second pass to store padded arrays
+    for row in data:
+        byte_data = row.astype(np.float32).tobytes()
+        compressed = zlib.compress(byte_data)
+        arr = np.frombuffer(compressed, dtype=np.uint8)
+        # Pad with zeros to match max_len
+        if len(arr) < max_len:
+            arr = np.pad(arr, (0, max_len - len(arr)), constant_values=0)
+        compressed_rows.append(arr)
+
+    return np.array(compressed_rows, dtype=np.uint8)
+
+# Apply the new preprocessing to the dataset
+X_compressed = compress_and_transform(X)
+
+# Split the new compressed-byte data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X_compressed, y, test_size=0.2, random_state=42
+)
+
+print(f"New X_train shape: {X_train.shape}")
+print(f"New X_test shape: {X_test.shape}")
+
+
+
+Compressing data with zlib and returning compressed bytes as features...
+New X_train shape: (11641, 667)
+New X_test shape: (2911, 667)
+
+first crete the time stamp
+the add data 
+in a json format
+
+crete independent sockets for every model and run models as demon process and generate logs for errors on terminal
